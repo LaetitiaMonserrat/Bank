@@ -1,0 +1,400 @@
+openapi: 3.0.0
+info:
+  version: 1.0.1
+  title: API bancaire
+  description: >-
+    Le présent document décrit le fonctionnement attendu de l\'API bancaire.
+    L\'interface implémentée devra contenir les fonctionnalités décrites sur
+    cette spécification.
+servers:
+  - url: 'https://apibancaire'
+    description: Url générale
+  - url: 'https://apibancaire/user/{userId}'
+    description: Récupérer les information d'un compte utilisateur
+paths:
+  /login:
+    post:
+      summary: Permet à un utilisateur de se connecter
+      description: Une page reliée à un formulaire avec un bouton pour se connecter à mon API
+      operationId: "connectUser"
+      tags:
+        - Utilisateur
+      parameters:
+        - name: id
+          in: query
+          description: ID de l'utilisateur
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':    
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: string
+        'default':
+          description: Erreur inattendue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /logout:
+    post:
+      summary: Permet à un utilisateur de se déconnecter
+      description: Un bouton sur le menu qui permet à l'utilisateur de se déconnecter
+      operationId: "disconnectUser"
+      tags:
+        - Utilisateur
+      parameters:
+        - name: id
+          in: query
+          description: ID de l'utilisateur
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':    
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: string
+        'default':
+          description: Erreur inattendue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /register:
+    post:
+      summary: Créer un utilisateur
+      operationId: detailsUser
+      tags:
+        - Utilisateur
+      parameters:
+        - name: id
+          in: query
+          description: ID de l'utilisateur
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: civility
+          in: query
+          description: Civilité de l'utilisateur
+          required: true
+          schema:
+            type: string
+            enum:
+              - Monsieur
+              - Madame
+        - name: firstName
+          in: query
+          description: Prénom de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: lastName
+          in: query
+          description: Nom de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: email
+          in: query
+          description: Mail de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: dateBirth
+          in: query
+          description: Date de naissance de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: address
+          in: query
+          description: Adresse de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: adressPostalCode
+          in: query
+          description: Code postal de l'utilisateur
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: adressCity
+          in: query
+          description: Ville de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: numberAccount
+          in: query
+          description: >-
+            Numéro de compte de l\'utilisateur qui est également l\'identifiant
+            du compte
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: codePIN
+          in: query
+          description: Code PIN de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+      responses:
+        '200':
+          description: Un utilisateur a bien été créé
+          headers:
+            x-next:
+              description: Un lien vers la page suivante
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        'default':
+          description: Erreur inattendue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user/{userId}:
+    get:
+      tags:
+        - Utilisateur
+      summary: "Accès aux informations du compte utilisateur grace à son id"
+      description: "Page d'informations du compte connexion utilisateur"
+      operationId: "getUserById"
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: "Les informations du compte utilisateur sont retournées"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: "ID inconnue"
+        '404':
+          description: "Utilisateur non trouvé"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        'default':
+          description: Erreur inattendue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /update:
+    put:
+      tags:
+        - Utilisateur
+      summary: "Permet à l'utilisateur de mettre à jour ses données"
+      description: "Un formulaire de modification de certaines de ses informations"
+      parameters:
+        - name: email
+          in: query
+          description: Mail de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: address
+          in: query
+          description: Adresse de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: adressPostalCode
+          in: query
+          description: Code postal de l'utilisateur
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: adressCity
+          in: query
+          description: Ville de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+        - name: codePIN
+          in: query
+          description: Code PIN de l'utilisateur
+          required: true
+          schema:
+            type: string
+            format: byte
+      responses:
+        '200':
+          description: "Les informations du compte utilisateur sont enregistrées et affichées"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: "ID inconnue"
+        '404':
+          description: "Utilisateur non trouvé"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        'default':
+          description: Erreur inattendue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transaction:
+    put:
+      tags:
+        - Compte
+      summary: "Faire une transaction sur son compte bancaire (dépôt ou retrait d'argent)"
+      description: "Permet de déposer ou retirer de l'argent sur son compte bancaire"
+      responses:
+        '200':
+          description: "Les informations du compte utilisateur sont enregistrées et affichées"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Compte'
+        '404':
+          description: "Compte Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        'default':
+          description: Erreur inattendue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - userId
+        - civility
+        - firstName
+        - lastName
+        - email
+        - dateBirth
+        - address
+        - adressPostalCode
+        - adressCity
+        - numberAccount
+        - codePIN
+      properties:
+        userId:
+          type: integer
+          format: int64
+        civility:
+          type: string
+          enum:
+            - Monsieur
+            - Madame
+        firstName:
+          type: string
+          format: byte
+        lastName:
+          type: string
+          format: byte
+        email:
+          type: string
+          format: byte
+        dateBirth:
+          type: string
+          format: date
+        address:
+          type: string
+          format: byte
+        adressPostalCode:
+          type: integer
+          format: int32
+        adressCity:
+          type: string
+          format: byte
+        numberAccount:
+          type: string
+          format: byte
+        codePIN:
+          type: string
+          format: byte
+    Compte:
+      type: object
+      required:
+        - compteId
+        - numberAccount
+        - montant
+        - bankId
+        - userId
+      properties:
+        compteId:
+          type: integer
+          format: int64
+        numberAccount:
+          type: string
+          format: byte
+        montant:
+          type: integer
+          format: int64
+        bankId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    NotFound:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
